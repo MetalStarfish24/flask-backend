@@ -51,7 +51,7 @@ def register_page():
     print(f"REGISTER_PAGE: Static folder: {app.static_folder}")
     print(f"REGISTER_PAGE: Static folder exists: {os.path.exists(app.static_folder) if app.static_folder else 'No static folder set'}")
     try:
-        return app.send_static_file('register.html')
+        return send_from_directory(app.static_folder, 'register.html')
     except Exception as e:
         print(f"REGISTER_PAGE ERROR: {e}")
         return f"Error loading register page: {e}", 500
@@ -100,7 +100,7 @@ def login_page():
         return redirect(url_for('index'))
     
     try:
-        return app.send_static_file('login.html')
+        return send_from_directory(app.static_folder, 'login.html')
     except Exception as e:
         print(f"LOGIN_PAGE ERROR: {e}")
         return f"Error loading login page: {e}", 500
@@ -157,7 +157,7 @@ def index():
     
     if current_user.is_authenticated:
         try:
-            return app.send_static_file('index.html')
+            return send_from_directory(app.static_folder, 'index.html')
         except Exception as e:
             print(f"INDEX ERROR serving index.html: {e}")
             return f"Error loading main page: {e}", 500
@@ -273,7 +273,6 @@ class Drink(db.Model):
     def __repr__(self):
         return f"{self.name} - {self.price} - {self.rating} - {self.description}"
 
-# Health check endpoint for Render
 @app.route('/health')
 def health_check():
     return {'status': 'healthy'}, 200
@@ -294,7 +293,6 @@ if __name__ == '__main__':
         print(f"WARNING: Frontend folder not found: {os.path.abspath(frontend_folder)}")
         print("Please adjust your file structure or the 'frontend_folder' variable")
     
-    # List current directory contents for debugging
     print(f"Current directory: {os.getcwd()}")
     print(f"Current directory contents: {os.listdir('.')}")
     
