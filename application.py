@@ -57,15 +57,28 @@ def login_page():
 @app.route('/login', methods=['POST'])
 def login():
     print("LOGIN POST: Received login request")
-    data = request.get_json()
-    print(f"LOGIN POST: Username: {data.get('username')}")
-    
-    user = User.query.filter_by(username=data['username']).first()
-    if user and bcrypt.check_password_hash(user.password, data['password']):
+
+    data = request.get_json(silent=True)
+
+    if not data:
+        print("LOGIN POST: No JSON data received")
+        return {'message': 'Invalid request - No JSON data'}, 400
+
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        print("LOGIN POST: Missing username or password")
+        return {'message': 'Username and password required'}, 400
+
+    print(f"LOGIN POST: Username: {username}")
+
+    user = User.query.filter_by(username=username).first()
+    if user and bcrypt.check_password_hash(user.password, password):
         login_user(user)
         print(f"LOGIN POST: User {user.username} logged in successfully")
         return {'message': 'Login successful', 'redirect': url_for('index')}, 200
-    
+
     print("LOGIN POST: Invalid credentials")
     return {'message': 'Invalid credentials'}, 401
 
